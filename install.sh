@@ -52,30 +52,31 @@ xdg-mime default helium.desktop x-scheme-handler/https
 echo "Done Installing Helium Browser"
 
 # SSH Agent Setup
-# -----------------------
-# SSH Agent Setup (Fish)
-# -----------------------
 ssh_agent_snippet='# --- SSH Agent Auto-Start ---
-set -q SSH_AGENT_ENV; or set SSH_AGENT_ENV $HOME/.ssh/agent.env
+# Starts ssh-agent if not running and adds keys
 
+# Load agent if already running
 function agent_load_env
-    test -f $SSH_AGENT_ENV; and source $SSH_AGENT_ENV >/dev/null 2>&1
+    # Nothing to load from file, Fish manages env in memory
+    return
 end
 
+# Start a new agent
 function agent_start
     umask 077
-    ssh-agent > $SSH_AGENT_ENV
-    source $SSH_AGENT_ENV >/dev/null 2>&1
+    eval (ssh-agent -c)  # Fish parses the output automatically
+    ssh-add
 end
 
+# Load existing agent (no-op)
 agent_load_env
 
+# Check agent state: 0 = has keys, 1 = running without keys, 2 = no agent
 ssh-add -l >/dev/null 2>&1
 set agent_run_state $status
 
 if test -z "$SSH_AUTH_SOCK" -o $agent_run_state -eq 2
     agent_start
-    ssh-add
 else if test -n "$SSH_AUTH_SOCK" -a $agent_run_state -eq 1
     ssh-add
 end'
