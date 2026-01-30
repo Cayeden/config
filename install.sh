@@ -8,6 +8,9 @@ sudo pacman -Syu
 # Install VS Code
 sudo pacman -S --noconfirm code
 
+# Install KeePassXC
+sudo pacman -S keepassxc
+
 # Browser
 echo Installing Helium Browser
 
