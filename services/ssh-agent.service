@@ -1,0 +1,12 @@
+[Unit]
+Description=User SSH key agent
+After=graphical.target
+
+[Service]
+Type=simple
+Environment=SSH_AUTH_SOCK=%t/ssh-agent.sock
+ExecStart=/usr/bin/ssh-agent -D -a %t/ssh-agent.sock
+ExecStop=/usr/bin/ssh-agent -k
+
+[Install]
+WantedBy=default.target

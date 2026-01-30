@@ -51,33 +51,22 @@ xdg-mime default helium.desktop x-scheme-handler/https
 
 echo "Done Installing Helium Browser"
 
-# SSH Agent Setup
-grep -Fq 'SSH Agent Auto-Start' "$fish_config" || cat <<'EOF' >> "$fish_config"
-# --- SSH Agent Auto-Start (Persistent) ---
-set SSH_AGENT_ENV $HOME/.ssh/agent.fish
+# -------------------------
+# SSH Agent Setup via systemd service
+# -------------------------
+echo "Setting up SSH Agent systemd service..."
 
-function agent_load_env
-    if test -f $SSH_AGENT_ENV
-        source $SSH_AGENT_ENV
-    end
-end
+# Copy pre-made systemd service
+mkdir -p "$HOME/.config/systemd/user"
+cp services/ssh-agent.service "$HOME/.config/systemd/user/ssh-agent.service"
 
-function agent_start
-    umask 077
-    # Use bash to start agent and convert to Fish syntax safely
-    bash -c "ssh-agent -c | sed \"s/^export /set -gx /; s/= / /; s/;\$//\" > \\\"$SSH_AGENT_ENV\\\""
-    source $SSH_AGENT_ENV
-    ssh-add
-end
+# Enable and start the service
+systemctl --user daemon-reload
+systemctl --user enable ssh-agent.service
+systemctl --user start ssh-agent.service
 
-agent_load_env
+# Ensure Fish reads SSH_AUTH_SOCK from systemd
+ssh_sock_export='set -gx SSH_AUTH_SOCK (systemctl show --user ssh-agent.service --property=Environment | string match -r "SSH_AUTH_SOCK=.*" | string replace -r "SSH_AUTH_SOCK=" "")'
+grep -Fxq "$ssh_sock_export" "$fish_config" || echo "$ssh_sock_export" >> "$fish_config"
 
-ssh-add -l >/dev/null 2>&1
-set agent_run_state $status
-
-if test -z "$SSH_AUTH_SOCK" -o $agent_run_state -eq 2
-    agent_start
-else if test -n "$SSH_AUTH_SOCK" -a $agent_run_state -eq 1
-    ssh-add
-end
-EOF
+echo "Done setting up SSH Agnet systemd service"
