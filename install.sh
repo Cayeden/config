@@ -68,5 +68,10 @@ systemctl --user start ssh-agent.service
 # Ensure Fish reads SSH_AUTH_SOCK from systemd
 ssh_sock_export='set -gx SSH_AUTH_SOCK (systemctl show --user ssh-agent.service --property=Environment | string match -r "SSH_AUTH_SOCK=.*" | string replace -r "SSH_AUTH_SOCK=" "")'
 grep -Fxq "$ssh_sock_export" "$fish_config" || echo "$ssh_sock_export" >> "$fish_config"
+systemctl --user import-environment SSH_AUTH_SOCK
+
+mkdir -p "$HOME/.config/hypr"
+cp hypr/autostart "$HOME/.config/hypr/autostart"
+chmod +x "$HOME/.config/hypr/autostart"
 
 echo "Done setting up SSH Agnet systemd service"
