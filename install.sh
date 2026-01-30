@@ -11,8 +11,8 @@ echo "Updating Package DataBase & Packages"
 sudo pacman -Syu
 
 # Install User packages
-echo "Installing VS Code and KeePassXC"
-sudo pacman -S --noconfirm code keepassxc
+echo "Installing User Packages"
+sudo pacman -S --noconfirm code keepassxc steam
 
 # Browser
 echo "Installing Helium Browser"
