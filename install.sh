@@ -2,8 +2,17 @@
 
 set -e
 
+# Update Packages and Package DataBase
+sudo pacman -Syu
+
+# Install VS Code
+sudo pacman -S --noconfirm code
+
 # Browser
 echo Installing Helium Browser
+
+pkill -f "/tmp/.mount_Helium"
+
 latest_url=$(curl -s https://api.github.com/repos/imputnet/helium-linux/releases/latest \
   | grep "browser_download_url.*x86_64.AppImage\"" \
   | cut -d '"' -f 4)
