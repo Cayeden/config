@@ -52,26 +52,26 @@ xdg-mime default helium.desktop x-scheme-handler/https
 echo "Done Installing Helium Browser"
 
 # SSH Agent Setup
-ssh_agent_snippet='# --- SSH Agent Auto-Start ---
-# Starts ssh-agent if not running and adds keys
+grep -Fq 'SSH Agent Auto-Start' "$fish_config" || cat <<'EOF' >> "$fish_config"
+# --- SSH Agent Auto-Start (Persistent) ---
+set SSH_AGENT_ENV $HOME/.ssh/agent.fish
 
-# Load agent if already running
 function agent_load_env
-    # Nothing to load from file, Fish manages env in memory
-    return
+    if test -f $SSH_AGENT_ENV
+        source $SSH_AGENT_ENV
+    end
 end
 
-# Start a new agent
 function agent_start
     umask 077
-    eval (ssh-agent -c)  # Fish parses the output automatically
+    # Use bash to start agent and convert to Fish syntax safely
+    bash -c "ssh-agent -c | sed \"s/^export /set -gx /; s/= / /; s/;\$//\" > \\\"$SSH_AGENT_ENV\\\""
+    source $SSH_AGENT_ENV
     ssh-add
 end
 
-# Load existing agent (no-op)
 agent_load_env
 
-# Check agent state: 0 = has keys, 1 = running without keys, 2 = no agent
 ssh-add -l >/dev/null 2>&1
 set agent_run_state $status
 
@@ -79,8 +79,5 @@ if test -z "$SSH_AUTH_SOCK" -o $agent_run_state -eq 2
     agent_start
 else if test -n "$SSH_AUTH_SOCK" -a $agent_run_state -eq 1
     ssh-add
-end'
-
-# Add SSH agent snippet to fish config only if not already present
-grep -Fq 'SSH Agent Auto-Start' "$fish_config" || echo "$ssh_agent_snippet" >> "$fish_config"
-
+end
+EOF
