@@ -8,11 +8,11 @@ cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
 
 # Update Packages and Package DataBase
 echo "Updating Package DataBase & Packages"
-sudo pacman -Syu
+sudo pacman -Syu --noconfirm
 
 # Install User packages
 echo "Installing User Packages"
-sudo pacman -S --noconfirm code keepassxc steam
+sudo pacman -S --noconfirm code keepassxc steam grim slurp wl-clipboard feh vlc
 
 # Browser
 echo "Installing Helium Browser"
