@@ -15,7 +15,7 @@ sudo pacman -Syu --noconfirm
 echo "Installing User Packages"
 sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard feh vlc hyprpaper
 
-sudo paru -S --noconfirm visual-studio-code-bin
+paru -S --noconfirm visual-studio-code-bin
 
 # Downloading wallpaper
 curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg"
@@ -56,28 +56,3 @@ xdg-mime default helium.desktop x-scheme-handler/http
 xdg-mime default helium.desktop x-scheme-handler/https
 
 echo "Done Installing Helium Browser"
-
-# -------------------------
-# SSH Agent Setup via systemd service
-# -------------------------
-echo "Setting up SSH Agent systemd service..."
-
-# Copy pre-made systemd service
-mkdir -p "$HOME/.config/systemd/user"
-cp services/ssh-agent.service "$HOME/.config/systemd/user/ssh-agent.service"
-
-# Enable and start the service
-systemctl --user daemon-reload
-systemctl --user enable ssh-agent.service
-systemctl --user start ssh-agent.service
-
-# Ensure Fish reads SSH_AUTH_SOCK from systemd
-ssh_sock_export='set -gx SSH_AUTH_SOCK (systemctl show --user ssh-agent.service --property=Environment | string match -r "SSH_AUTH_SOCK=.*" | string replace -r "SSH_AUTH_SOCK=" "")'
-grep -Fxq "$ssh_sock_export" "$fish_config" || echo "$ssh_sock_export" >> "$fish_config"
-systemctl --user import-environment SSH_AUTH_SOCK
-
-mkdir -p "$HOME/.config/hypr"
-cp hypr/autostart "$HOME/.config/hypr/autostart"
-chmod +x "$HOME/.config/hypr/autostart"
-
-echo "Done setting up SSH Agnet systemd service"
