@@ -5,7 +5,6 @@ set -e
 # Hyprland Config
 mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
 cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
-cp hypr/hyprpaper.conf "$HOME/.config/hypr/hyprpaper.conf"
 
 # Update Packages and Package DataBase
 echo "Updating Package DataBase & Packages"
@@ -16,9 +15,6 @@ echo "Installing User Packages"
 sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard feh vlc hyprpaper
 
 paru -S --noconfirm visual-studio-code-bin
-
-# Downloading wallpaper
-curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg"
 
 # Browser
 echo "Installing Helium Browser"
@@ -56,3 +52,19 @@ xdg-mime default helium.desktop x-scheme-handler/http
 xdg-mime default helium.desktop x-scheme-handler/https
 
 echo "Done Installing Helium Browser"
+
+# Setup /mnt/storage
+sudo mkdir -p /mnt/storage
+if ! mountpoint -q /mnt/storage; then
+  sudo mount /mnt/storage 2>/dev/null || sudo btrfs device scan && sudo mount -U "$(sudo btrfs filesystem show 2>/dev/null | grep -oP 'uuid: \K[a-f0-9-]+' | head -1)" /mnt/storage
+  echo "Mounted /mnt/storage"
+fi
+
+if mountpoint -q /mnt/storage; then
+  sudo grep -q '/mnt/storage' /etc/fstab || echo "UUID=$(sudo btrfs filesystem show /mnt/storage | grep -oP 'uuid: \K[a-f0-9-]+' | head -1) /mnt/storage btrfs defaults,noatime,compress=zstd 0 0" | sudo tee -a /etc/fstab >/dev/null
+  sudo chown -R "$USER:$USER" /mnt/storage
+  echo "Configured /mnt/storage in /etc/fstab and set ownership to $USER"
+fi
+
+# Downloading wallpaper
+curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg"
