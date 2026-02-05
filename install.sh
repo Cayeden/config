@@ -5,14 +5,20 @@ set -e
 # Hyprland Config
 mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
 cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
+cp hypr/hyprpaper.conf "$HOME/.config/hypr/hyprpaper.conf"
 
 # Update Packages and Package DataBase
 echo "Updating Package DataBase & Packages"
 sudo pacman -Syu --noconfirm
 
-# Install User packages
+# Install User Packages
 echo "Installing User Packages"
-sudo pacman -S --noconfirm code keepassxc steam grim slurp wl-clipboard feh vlc
+sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard feh vlc hyprpaper
+
+sudo paru -S --noconfirm visual-studio-code-bin
+
+# Downloading wallpaper
+curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg"
 
 # Browser
 echo "Installing Helium Browser"
