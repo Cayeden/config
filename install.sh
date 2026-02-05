@@ -3,11 +3,9 @@
 set -e
 
 # Hyprland Config
-if [ ! -f "$HOME/.config/hypr/hyprland.conf" ]; then
-  mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
-  cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
-  echo "✓ Hyprland config installed"
-fi
+mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
+cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
+echo "✓ Hyprland config installed"
 
 # Update Packages and Package DataBase
 sudo pacman -Syu --noconfirm >/dev/null 2>&1
