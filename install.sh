@@ -77,3 +77,9 @@ USER_GID="$(id -g)"
 sudo chown "$USER_UID:$USER_GID" "$STORAGE_MNT"
 
 echo "✓ /mnt/storage mounted and ownership set"
+
+# Downloading wallpaper
+if [ ! -f /mnt/storage/wallpaper.png ]; then
+  curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg" >/dev/null 2>&1
+  echo "✓ Wallpaper downloaded"
+fi
