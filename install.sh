@@ -83,3 +83,6 @@ if [ ! -f /mnt/storage/wallpaper.png ]; then
   curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg" >/dev/null 2>&1
   echo "✓ Wallpaper downloaded"
 fi
+
+# Set max volume
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 1
