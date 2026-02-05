@@ -39,21 +39,41 @@ if [ ! -f /usr/local/bin/helium ]; then
   echo "✓ Helium Browser installed"
 fi
 
-# Setup /mnt/storage
-sudo mkdir -p /mnt/storage
-if ! mountpoint -q /mnt/storage; then
-  sudo mount /mnt/storage 2>/dev/null || sudo btrfs device scan && sudo mount -U "$(sudo btrfs filesystem show 2>/dev/null | grep -oP 'uuid: \K[a-f0-9-]+' | head -1)" /mnt/storage
-  echo "✓ Mounted /mnt/storage"
+# Storage mount
+
+STORAGE_UUID="3a0db3a3-f6ab-4ce6-8c18-1e27e54ce7ef"
+STORAGE_MNT="/mnt/storage"
+
+# Do not run as root
+if [ "$(id -u)" -eq 0 ]; then
+  echo "✗ Do not run this script as root"
+  exit 1
 fi
 
-if mountpoint -q /mnt/storage; then
-  sudo grep -q '/mnt/storage' /etc/fstab || echo "UUID=$(sudo btrfs filesystem show /mnt/storage | grep -oP 'uuid: \K[a-f0-9-]+' | head -1) /mnt/storage btrfs defaults,noatime,compress=zstd 0 0" | sudo tee -a /etc/fstab >/dev/null
-  sudo chown -R "$USER:$USER" /mnt/storage
-  echo "✓ Configured /mnt/storage in /etc/fstab"
+# Create mountpoint
+sudo mkdir -p "$STORAGE_MNT"
+
+# Add to fstab if missing
+if ! sudo grep -q "$STORAGE_UUID" /etc/fstab; then
+  echo "UUID=$STORAGE_UUID $STORAGE_MNT btrfs defaults,noatime,compress=zstd 0 0" \
+    | sudo tee -a /etc/fstab >/dev/null
+  echo "✓ Added /mnt/storage to /etc/fstab"
 fi
 
-# Downloading wallpaper
-if [ ! -f /mnt/storage/wallpaper.png ]; then
-  curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg" >/dev/null 2>&1
-  echo "✓ Wallpaper downloaded"
+# Mount via fstab
+sudo mount "$STORAGE_MNT"
+
+# Hard safety check
+if ! mountpoint -q "$STORAGE_MNT"; then
+  echo "✗ Failed to mount $STORAGE_MNT"
+  exit 1
 fi
+
+# Resolve user dynamically
+USER_UID="$(id -u)"
+USER_GID="$(id -g)"
+
+# Never recursive
+sudo chown "$USER_UID:$USER_GID" "$STORAGE_MNT"
+
+echo "✓ /mnt/storage mounted and ownership set"
