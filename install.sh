@@ -5,14 +5,20 @@ set -e
 # Hyprland Config
 mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
 cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
+cp hypr/hyprpaper.conf "$HOME/.config/hypr/hyprpaper.conf"
 echo "✓ Hyprland config installed"
+
+# Fish Config
+mkdir -p "$HOME/.config/fish"
+cp fish/config.fish "$HOME/.config/fish/config.fish"
+echo "✓ Fish config installed"
 
 # Update Packages and Package DataBase
 sudo pacman -Syu --noconfirm >/dev/null 2>&1
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard feh vlc hyprpaper >/dev/null 2>&1
+sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep >/dev/null 2>&1
 echo "✓ Packages installed (pacman)"
 paru -S --noconfirm visual-studio-code-bin >/dev/null 2>&1
 echo "✓ Packages installed (paru/AUR)"
@@ -25,12 +31,6 @@ if [ ! -f /usr/local/bin/helium ]; then
     | cut -d '"' -f 4)
   sudo curl -L -o /usr/local/bin/helium "$latest_url" >/dev/null 2>&1
   sudo chmod +x /usr/local/bin/helium
-
-  browser_export="set -gx BROWSER /usr/local/bin/helium"
-  fish_config="$HOME/.config/fish/config.fish"
-  mkdir -p "$(dirname "$fish_config")"
-  touch "$fish_config"
-  grep -Fxq "$browser_export" "$fish_config" || echo "$browser_export" >> "$fish_config"
 
   cp desktop-files/helium.desktop "$HOME/.local/share/applications/" 2>/dev/null || true
   update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
