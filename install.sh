@@ -60,13 +60,13 @@ if ! sudo grep -q "$STORAGE_UUID" /etc/fstab; then
   echo "✓ Added /mnt/storage to /etc/fstab"
 fi
 
-# Mount via fstab
-sudo mount "$STORAGE_MNT"
-
-# Hard safety check
+# Mount via fstab if not already mounted
 if ! mountpoint -q "$STORAGE_MNT"; then
-  echo "✗ Failed to mount $STORAGE_MNT"
-  exit 1
+  sudo mount "$STORAGE_MNT"
+  if ! mountpoint -q "$STORAGE_MNT"; then
+    echo "✗ Failed to mount $STORAGE_MNT"
+    exit 1
+  fi
 fi
 
 # Resolve user dynamically
