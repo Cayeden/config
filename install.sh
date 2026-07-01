@@ -5,7 +5,6 @@ set -e
 # Hyprland Config
 mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
 cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
-cp hypr/hyprpaper.conf "$HOME/.config/hypr/hyprpaper.conf"
 echo "✓ Hyprland config installed"
 
 # Fish Config
