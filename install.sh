@@ -5,6 +5,7 @@ set -e
 # Hyprland Config
 mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
 cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
+cp hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
 echo "✓ Hyprland config installed"
 
 # Fish Config
@@ -12,12 +13,20 @@ mkdir -p "$HOME/.config/fish"
 cp fish/config.fish "$HOME/.config/fish/config.fish"
 echo "✓ Fish config installed"
 
+# Waybar Config
+mkdir -p "$HOME/.config/waybar/scripts"
+cp waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
+cp waybar/style.css "$HOME/.config/waybar/style.css"
+cp waybar/scripts/*.sh "$HOME/.config/waybar/scripts/"
+chmod +x "$HOME/.config/waybar/scripts/"*.sh
+echo "✓ Waybar config installed"
+
 # Update Packages and Package DataBase
 sudo pacman -Syu --noconfirm >/dev/null 2>&1
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin >/dev/null 2>&1
+sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock >/dev/null 2>&1
 echo "✓ Packages installed (pacman)"
 paru -S --noconfirm visual-studio-code-bin >/dev/null 2>&1
 echo "✓ Packages installed (paru/AUR)"

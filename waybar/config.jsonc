@@ -1,0 +1,85 @@
+// -*- mode: jsonc -*-
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "margin-top": 6,
+    "margin-left": 10,
+    "margin-right": 10,
+    "spacing": 6,
+
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/submap"
+    ],
+    "modules-center": [
+        "hyprland/window"
+    ],
+    "modules-right": [
+        "custom/vpn",
+        "network",
+        "pulseaudio",
+        "cpu",
+        "memory",
+        "clock",
+        "tray"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        }
+    },
+    "hyprland/submap": {
+        "format": "<span style=\"italic\">{}</span>",
+        "tooltip": false
+    },
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+    "custom/vpn": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "$HOME/.config/waybar/scripts/vpn-status.sh",
+        "on-click": "$HOME/.config/waybar/scripts/vpn-toggle.sh",
+        "interval": 5,
+        "tooltip": true
+    },
+
+    "network": {
+        "format-wifi": "",
+        "format-ethernet": "",
+        "format-disconnected": "",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) — {ipaddr}/{cidr}",
+        "tooltip-format-ethernet": "{ifname} — {ipaddr}/{cidr}",
+        "tooltip-format-disconnected": "Disconnected"
+    },
+
+    "pulseaudio": {
+        "format": " {volume}%",
+        "format-muted": " muted",
+        "on-click": "pavucontrol"
+    },
+
+    "cpu": {
+        "format": " {usage}%",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "󰍛 {}%"
+    },
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "{:%a %d %b}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "tray": {
+        "spacing": 10
+    }
+}
