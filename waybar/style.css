@@ -8,6 +8,7 @@
 @define-color text-dim   #565f89;
 @define-color cyan       #2ac3de;
 @define-color green      #3fdd8a;
+@define-color yellow     #e0af68;
 @define-color red        #f7768e;
 
 * {
@@ -29,8 +30,10 @@ window#waybar {
 #custom-vpn,
 #network,
 #pulseaudio,
-#cpu,
+#custom-cpu,
+#custom-nvidia-gpu,
 #memory,
+#disk,
 #clock,
 #tray {
     background: @surface;
@@ -85,6 +88,15 @@ window#waybar {
     color: @text-dim;
 }
 
+#custom-vpn.connecting {
+    color: @yellow;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: 0.4; }
+}
+
 #network.disconnected {
     color: @red;
     border-color: @red;
@@ -92,6 +104,12 @@ window#waybar {
 
 #pulseaudio.muted {
     color: @text-dim;
+}
+
+#custom-nvidia-gpu.critical,
+#custom-cpu.critical {
+    color: @red;
+    border-color: @red;
 }
 
 #clock {
