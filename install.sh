@@ -26,7 +26,7 @@ sudo pacman -Syu --noconfirm >/dev/null 2>&1
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq >/dev/null 2>&1
+sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose >/dev/null 2>&1
 echo "✓ Packages installed (pacman)"
 paru -S --noconfirm visual-studio-code-bin >/dev/null 2>&1
 echo "✓ Packages installed (paru/AUR)"
@@ -37,6 +37,11 @@ warp-cli registration show >/dev/null 2>&1 || warp-cli --accept-tos registration
 warp-cli --accept-tos mode warp >/dev/null 2>&1
 warp-cli --accept-tos connect >/dev/null 2>&1
 echo "✓ Cloudflare WARP connected"
+
+# Docker (enable daemon + let this user run docker without sudo via the docker group)
+sudo systemctl enable --now docker.service >/dev/null 2>&1
+sudo usermod -aG docker "$USER"
+echo "✓ Docker enabled (log out/in for 'docker' group to take effect)"
 
 # Browser
 if [ ! -f /usr/local/bin/helium ]; then
