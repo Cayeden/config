@@ -27,6 +27,7 @@ window#waybar {
 #workspaces,
 #submap,
 #window,
+#custom-docker,
 #custom-vpn,
 #network,
 #pulseaudio,
@@ -95,6 +96,14 @@ window#waybar {
 
 @keyframes pulse {
     50% { opacity: 0.4; }
+}
+
+#custom-docker.up {
+    color: @cyan;
+}
+
+#custom-docker.down {
+    color: @text-dim;
 }
 
 #network.disconnected {

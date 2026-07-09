@@ -10,6 +10,7 @@
 
     "modules-left": [
         "hyprland/workspaces",
+        "custom/docker",
         "hyprland/submap"
     ],
     "modules-center": [
@@ -34,6 +35,13 @@
     "hyprland/submap": {
         "format": "<span style=\"italic\">{}</span>",
         "tooltip": false
+    },
+    "custom/docker": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "$HOME/.config/waybar/scripts/docker-status.sh",
+        "interval": 5,
+        "on-click": "kitty -e docker stats"
     },
     "hyprland/window": {
         "format": "{}",
