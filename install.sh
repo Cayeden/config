@@ -62,6 +62,17 @@ sed -i "s/SEARXNG_SECRET_PLACEHOLDER/$(openssl rand -hex 32)/" "$HOME/searxng/co
 sudo docker compose -f "$HOME/searxng/docker-compose.yml" up -d >/dev/null 2>&1
 echo "✓ SearXNG running on http://127.0.0.1:8888"
 
+# Claude Code (native installer) + config
+if ! command -v claude >/dev/null 2>&1; then
+  curl -fsSL https://claude.ai/install.sh | bash >/dev/null 2>&1
+fi
+mkdir -p "$HOME/.claude"
+cp claude/settings.json "$HOME/.claude/settings.json"
+cp claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
+cp claude/statusline-command.py "$HOME/.claude/statusline-command.py"
+chmod +x "$HOME/.claude/statusline-command.py"
+echo "✓ Claude Code installed and configured"
+
 # Browser
 if [ ! -f /usr/local/bin/helium ]; then
   pkill -f "/tmp/.mount_helium" 2>/dev/null || true
