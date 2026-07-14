@@ -52,6 +52,16 @@ sudo systemctl enable --now ufw.service >/dev/null 2>&1
 sudo ufw --force enable >/dev/null 2>&1
 echo "✓ UFW firewall enabled"
 
+# SearXNG (local metasearch on :8888, used as LM Studio's search backend)
+mkdir -p "$HOME/searxng/core-config"
+cp searxng/docker-compose.yml "$HOME/searxng/docker-compose.yml"
+cp searxng/.env "$HOME/searxng/.env"
+cp searxng/core-config/settings.yml "$HOME/searxng/core-config/settings.yml"
+# inject a fresh secret_key (the real one is never stored in this public repo)
+sed -i "s/SEARXNG_SECRET_PLACEHOLDER/$(openssl rand -hex 32)/" "$HOME/searxng/core-config/settings.yml"
+sudo docker compose -f "$HOME/searxng/docker-compose.yml" up -d >/dev/null 2>&1
+echo "✓ SearXNG running on http://127.0.0.1:8888"
+
 # Browser
 if [ ! -f /usr/local/bin/helium ]; then
   pkill -f "/tmp/.mount_helium" 2>/dev/null || true
