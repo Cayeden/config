@@ -1,3 +1,5 @@
+source /usr/share/cachyos-fish-config/cachyos-config.fish
+
 set -gx BROWSER /usr/local/bin/helium
 
 if status is-interactive
