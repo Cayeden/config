@@ -6,6 +6,10 @@ set -e
 mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
 cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
 cp hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
+# CachyOS ships a Lua-based Hyprland config (hyprland.lua + config/) that
+# Hyprland loads in preference to hyprland.conf. Remove it so ours is used.
+rm -f  "$HOME/.config/hypr/hyprland.lua"
+rm -rf "$HOME/.config/hypr/config"
 echo "✓ Hyprland config installed"
 
 # Fish Config
@@ -26,7 +30,7 @@ sudo pacman -Syu --noconfirm >/dev/null 2>&1
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils >/dev/null 2>&1
+sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils wofi paru >/dev/null 2>&1
 echo "✓ Packages installed (pacman)"
 paru -S --noconfirm visual-studio-code-bin lmstudio-bin >/dev/null 2>&1
 echo "✓ Packages installed (paru/AUR)"
