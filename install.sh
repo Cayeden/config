@@ -26,9 +26,9 @@ sudo pacman -Syu --noconfirm >/dev/null 2>&1
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose >/dev/null 2>&1
+sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils >/dev/null 2>&1
 echo "✓ Packages installed (pacman)"
-paru -S --noconfirm visual-studio-code-bin >/dev/null 2>&1
+paru -S --noconfirm visual-studio-code-bin lmstudio-bin >/dev/null 2>&1
 echo "✓ Packages installed (paru/AUR)"
 
 # VPN (Cloudflare WARP)
@@ -42,6 +42,15 @@ echo "✓ Cloudflare WARP connected"
 sudo systemctl enable --now docker.service >/dev/null 2>&1
 sudo usermod -aG docker "$USER"
 echo "✓ Docker enabled (log out/in for 'docker' group to take effect)"
+
+# Bluetooth
+sudo systemctl enable --now bluetooth.service >/dev/null 2>&1
+echo "✓ Bluetooth enabled"
+
+# Firewall (UFW)
+sudo systemctl enable --now ufw.service >/dev/null 2>&1
+sudo ufw --force enable >/dev/null 2>&1
+echo "✓ UFW firewall enabled"
 
 # Browser
 if [ ! -f /usr/local/bin/helium ]; then
