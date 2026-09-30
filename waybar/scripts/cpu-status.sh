@@ -23,17 +23,45 @@ for ((i = 1; i < ${#before[@]}; i++)); do
   percore+=("$(calc_usage "${before[$i]}" "${after[$i]}")")
 done
 
-# ponytail: hwmon numbering can shift after kernel/driver updates,
-# re-check `sensors` for k10temp's hwmon path if this goes blank.
-# AMD's k10temp only exposes Tctl (overall) and Tccd1 (chiplet) here,
-# not true per-core temps -- that granularity isn't available on this CPU.
-tctl=$(( $(cat /sys/class/hwmon/hwmon3/temp1_input) / 1000 ))
-tccd1=$(( $(cat /sys/class/hwmon/hwmon3/temp3_input 2>/dev/null || echo 0) / 1000 ))
+# hwmon numbers change between boots. Match CPU drivers and sensor labels.
+# CPU_HWMON_ROOT allows checking discovery against a fixture directory.
+tctl= tccd1=
+for sensor in "${CPU_HWMON_ROOT:-/sys/class/hwmon}"/hwmon*; do
+  [[ -r "$sensor/name" ]] || continue
+  read -r driver < "$sensor/name"
+  case "$driver" in k10temp|zenpower|coretemp) ;; *) continue ;; esac
+  fallback= package= die= control= chiplet=
+  for input in "$sensor"/temp*_input; do
+    [[ -r "$input" ]] || continue
+    read -r value < "$input" || continue
+    [[ "$value" =~ ^[0-9]+$ ]] || continue
+    value=$((10#$value / 1000))
+    label=
+    [[ ! -r "${input%_input}_label" ]] || read -r label < "${input%_input}_label"
+    case "$label" in
+      Tctl) control=$value ;;
+      Tdie) die=$value ;;
+      'Package id 0') package=$value ;;
+      Tccd1) chiplet=$value ;;
+    esac
+    [[ "$input" != "$sensor/temp1_input" ]] || fallback=$value
+  done
+  tctl=${control:-${die:-${package:-$fallback}}}
+  tccd1=$chiplet
+  [[ -z "$tctl" ]] || break
+done
 
 class="normal"
-(( tctl >= 85 )) && class="critical"
+[[ -z "$tctl" ]] || { (( tctl < 85 )) || class="critical"; }
 
-tooltip="${usage}% total  |  Tctl ${tctl}°C  Tccd1 ${tccd1}°C"
+if [[ -n "$tctl" ]]; then
+  text="CPU ${usage}% ${tctl}°C"
+  tooltip="${usage}% total  |  CPU ${tctl}°C"
+  [[ -z "$tccd1" ]] || tooltip+="  Tccd1 ${tccd1}°C"
+else
+  text="CPU ${usage}%"
+  tooltip="${usage}% total  |  CPU temperature unavailable"
+fi
 for ((i = 0; i < ${#percore[@]}; i += 4)); do
   line=""
   for ((j = i; j < i + 4 && j < ${#percore[@]}; j++)); do
@@ -42,4 +70,4 @@ for ((i = 0; i < ${#percore[@]}; i += 4)); do
   tooltip+="\n${line% }"
 done
 
-printf '{"text":"CPU %s%% %s°C","tooltip":"%s","class":"%s"}\n' "$usage" "$tctl" "$tooltip" "$class"
+printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' "$text" "$tooltip" "$class"

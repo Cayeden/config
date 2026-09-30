@@ -31,3 +31,9 @@ if status is-interactive
 
     set -e envfile
 end
+fish_add_path $HOME/.local/npm/bin
+
+fish_add_path $HOME/.local/bin
+
+# Added by LM Studio CLI tool (lms)
+fish_add_path $HOME/.lmstudio/bin

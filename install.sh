@@ -1,39 +1,26 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-# Hyprland Config
-mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
-cp hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
-cp hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
-# CachyOS ships a Lua-based Hyprland config (hyprland.lua + config/) that
-# Hyprland loads in preference to hyprland.conf. Remove it so ours is used.
-rm -f  "$HOME/.config/hypr/hyprland.lua"
-rm -rf "$HOME/.config/hypr/config"
-echo "✓ Hyprland config installed"
-
-# Fish Config
-mkdir -p "$HOME/.config/fish"
-cp fish/config.fish "$HOME/.config/fish/config.fish"
-echo "✓ Fish config installed"
-
-# Waybar Config
-mkdir -p "$HOME/.config/waybar/scripts"
-cp waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
-cp waybar/style.css "$HOME/.config/waybar/style.css"
-cp waybar/scripts/*.sh "$HOME/.config/waybar/scripts/"
-chmod +x "$HOME/.config/waybar/scripts/"*.sh
-echo "✓ Waybar config installed"
+if [ "$(id -u)" -eq 0 ]; then
+  echo "Run this installer as your normal user." >&2
+  exit 1
+fi
+cd "$(dirname "$(readlink -f "$0")")"
 
 # Update Packages and Package DataBase
-sudo pacman -Syu --noconfirm >/dev/null 2>&1
+sudo pacman -Syu --noconfirm
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --noconfirm keepassxc steam grim slurp wl-clipboard vlc hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils wofi paru >/dev/null 2>&1
+sudo pacman -S --needed --noconfirm keepassxc steam grim slurp wl-clipboard mpv hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils wofi paru kitty dolphin fish playerctl brightnessctl polkit-kde-agent curl openssl desktop-file-utils
 echo "✓ Packages installed (pacman)"
-paru -S --noconfirm visual-studio-code-bin lmstudio-bin >/dev/null 2>&1
+paru -S --needed --noconfirm visual-studio-code-bin lmstudio-bin
 echo "✓ Packages installed (paru/AUR)"
+
+# Desktop and shell configuration
+./scripts/configure-user.sh
+echo "✓ Hyprland, Fish, and Waybar configuration installed"
 
 # VPN (Cloudflare WARP)
 sudo systemctl enable --now warp-svc >/dev/null 2>&1
@@ -66,43 +53,16 @@ sed -i "s/SEARXNG_SECRET_PLACEHOLDER/$(openssl rand -hex 32)/" "$HOME/searxng/co
 sudo docker compose -f "$HOME/searxng/docker-compose.yml" up -d >/dev/null 2>&1
 echo "✓ SearXNG running on http://127.0.0.1:8888"
 
-# Claude Code (native installer) + config
-if ! command -v claude >/dev/null 2>&1; then
-  curl -fsSL https://claude.ai/install.sh | bash >/dev/null 2>&1
-fi
-mkdir -p "$HOME/.claude"
-cp claude/settings.json "$HOME/.claude/settings.json"
-cp claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
-cp claude/statusline-command.py "$HOME/.claude/statusline-command.py"
-chmod +x "$HOME/.claude/statusline-command.py"
-echo "✓ Claude Code installed and configured"
+# Polkit and CPU sensor driver
+./scripts/configure-system.sh
 
-# Browser
-if [ ! -f /usr/local/bin/helium ]; then
-  pkill -f "/tmp/.mount_helium" 2>/dev/null || true
-  latest_url=$(curl -s https://api.github.com/repos/imputnet/helium-linux/releases/latest \
-    | grep -m1 "browser_download_url.*x86_64.AppImage" \
-    | cut -d '"' -f 4)
-  sudo curl -L -o /usr/local/bin/helium "$latest_url" >/dev/null 2>&1
-  sudo chmod +x /usr/local/bin/helium
-
-  cp desktop-files/helium.desktop "$HOME/.local/share/applications/" 2>/dev/null || true
-  update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
-  xdg-mime default helium.desktop x-scheme-handler/http 2>/dev/null || true
-  xdg-mime default helium.desktop x-scheme-handler/https 2>/dev/null || true
-  echo "✓ Helium Browser installed"
-fi
+# Browser: check the latest release on every install, including existing installs.
+./scripts/update-helium
 
 # Storage mount
 
 STORAGE_UUID="3a0db3a3-f6ab-4ce6-8c18-1e27e54ce7ef"
 STORAGE_MNT="/mnt/storage"
-
-# Do not run as root
-if [ "$(id -u)" -eq 0 ]; then
-  echo "✗ Do not run this script as root"
-  exit 1
-fi
 
 # Create mountpoint
 sudo mkdir -p "$STORAGE_MNT"
