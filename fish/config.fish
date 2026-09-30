@@ -24,9 +24,9 @@ if status is-interactive
 
     if not set -q SSH_AUTH_SOCK; or test $agent_run_state -eq 2
         agent_start
-        ssh-add
+        ssh-add ~/.ssh/id_ed25519_personal ~/.ssh/id_ed25519_school
     else if set -q SSH_AUTH_SOCK; and test $agent_run_state -eq 1
-        ssh-add
+        ssh-add ~/.ssh/id_ed25519_personal ~/.ssh/id_ed25519_school
     end
 
     set -e envfile

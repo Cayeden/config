@@ -59,11 +59,42 @@ echo "✓ SearXNG running on http://127.0.0.1:8888"
 # Browser: check the latest release on every install, including existing installs.
 ./scripts/update-helium
 
-# Wallpaper (stored under the user's data directory, without a disk-specific mount).
-WALLPAPER_DIR="$HOME/.local/share/wallpapers"
-mkdir -p "$WALLPAPER_DIR"
-if [ ! -f "$WALLPAPER_DIR/default.jpg" ]; then
-  curl --fail --location --show-error -o "$WALLPAPER_DIR/default.jpg" "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg"
+# Storage mount
+
+STORAGE_UUID="3a0db3a3-f6ab-4ce6-8c18-1e27e54ce7ef"
+STORAGE_MNT="/mnt/storage"
+
+# Create mountpoint
+sudo mkdir -p "$STORAGE_MNT"
+
+# Add to fstab if missing
+if ! sudo grep -q "$STORAGE_UUID" /etc/fstab; then
+  echo "UUID=$STORAGE_UUID $STORAGE_MNT btrfs defaults,noatime,compress=zstd 0 0" \
+    | sudo tee -a /etc/fstab >/dev/null
+  echo "✓ Added /mnt/storage to /etc/fstab"
+fi
+
+# Mount via fstab if not already mounted
+if ! mountpoint -q "$STORAGE_MNT"; then
+  sudo mount "$STORAGE_MNT"
+  if ! mountpoint -q "$STORAGE_MNT"; then
+    echo "✗ Failed to mount $STORAGE_MNT"
+    exit 1
+  fi
+fi
+
+# Resolve user dynamically
+USER_UID="$(id -u)"
+USER_GID="$(id -g)"
+
+# Never recursive
+sudo chown "$USER_UID:$USER_GID" "$STORAGE_MNT"
+
+echo "✓ /mnt/storage mounted and ownership set"
+
+# Downloading wallpaper
+if [ ! -f /mnt/storage/wallpaper.png ]; then
+  curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg" >/dev/null 2>&1
   echo "✓ Wallpaper downloaded"
 fi
 

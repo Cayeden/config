@@ -8,11 +8,7 @@ Install on a CachyOS machine as your normal user:
 curl -fsSL https://raw.githubusercontent.com/Cayeden/config/main/setup.sh | bash
 ```
 
-Review `install.sh` before running it: it upgrades packages, installs applications and configs, connects WARP, and enables Docker, Bluetooth, and UFW. It does not uninstall existing applications or modify storage mounts. Replaced desktop and shell configuration files are backed up under `~/.local/state/config-backups/`.
-
-## Local settings
-
-The public configs use automatic monitor placement, the root filesystem for the disk widget, and standard SSH key filenames. Adjust those settings locally for your machine. Add personal SSH identities through your private SSH configuration or `ssh-add`; do not commit private keys or credentials. Wallpaper is stored at `~/.local/share/wallpapers/default.jpg`.
+Review `install.sh` before running it: it upgrades packages, installs applications and configs, connects WARP, enables Docker, Bluetooth, and UFW, and configures the existing `/mnt/storage` mount. It does not uninstall existing applications. Replaced desktop and shell configuration files are backed up under `~/.local/state/config-backups/`.
 
 ## Helium updates
 
