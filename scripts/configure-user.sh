@@ -24,27 +24,15 @@ copy_config() {
   cp "$source" "$destination"
 }
 
-# Uninstall user-owned programs and archive their data for recovery.
-for relative in \
-  .opencode .config/opencode .config/ai.opencode.desktop .local/share/opencode .local/state/opencode \
-  .local/opt/opencode-desktop .local/bin/opencode .local/bin/opencode-desktop \
-  .local/share/applications/ai.opencode.desktop \
-  .local/bin/claude .local/share/claude .local/state/claude .claude .claude.json \
-  .local/share/applications/claude-code-url-handler.desktop \
-  .local/bin/mouse-recorder .local/bin/mouse-recorder.save .local/share/mouse-recorder \
-  .local/bin/fan-comfort-tuner .local/share/fan-comfort-tuner \
-  .local/share/applications/fan-comfort-tuner.desktop; do
-  archive "$HOME/$relative"
-done
-
 copy_config fish/config.fish "$HOME/.config/fish/config.fish"
 copy_config hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
-copy_config waybar/scripts/cpu-status.sh "$HOME/.config/waybar/scripts/cpu-status.sh"
-chmod +x "$HOME/.config/waybar/scripts/cpu-status.sh"
-
-if command -v fish >/dev/null; then
-  fish -c 'set -U fish_user_paths (string match -v -- "$HOME/.opencode/bin" $fish_user_paths)'
-fi
+copy_config hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
+copy_config waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
+copy_config waybar/style.css "$HOME/.config/waybar/style.css"
+for script in waybar/scripts/*.sh; do
+  copy_config "$script" "$HOME/.config/waybar/scripts/${script##*/}"
+  chmod +x "$HOME/.config/waybar/scripts/${script##*/}"
+done
 
 mkdir -p "$HOME/.config/uwsm"
 environment_file="$HOME/.config/uwsm/env"
@@ -60,11 +48,6 @@ chmod +x "$HOME/.local/bin/update-helium"
 
 mkdir -p "$HOME/.local/share/applications"
 copy_config desktop-files/helium.desktop "$HOME/.local/share/applications/helium.desktop"
-mime_file="$HOME/.config/mimeapps.list"
-if [[ -f "$mime_file" ]]; then
-  cp "$mime_file" "$backup/mimeapps.list"
-  sed -i '/^x-scheme-handler\/\(claude-cli\|opencode\)=/d' "$mime_file"
-fi
 update-desktop-database "$HOME/.local/share/applications"
 for type in x-scheme-handler/http x-scheme-handler/https text/html; do
   xdg-mime default helium.desktop "$type"

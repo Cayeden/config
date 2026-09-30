@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Remove VLC only when installed. Do not remove shared dependencies.
-if pacman -Q vlc >/dev/null 2>&1; then
-  sudo pacman -R --noconfirm vlc
-fi
-
 # k10temp exposes AMD CPU temperatures. Keep Intel/non-AMD installs portable.
 if grep -q 'vendor_id.*AuthenticAMD' /proc/cpuinfo; then
   sudo modprobe k10temp

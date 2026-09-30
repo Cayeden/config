@@ -18,23 +18,9 @@ echo "✓ Packages installed (pacman)"
 paru -S --needed --noconfirm visual-studio-code-bin lmstudio-bin
 echo "✓ Packages installed (paru/AUR)"
 
-# Hyprland Config
-mkdir -p "$HOME/.config/hypr" "$HOME/.local/share/applications"
-cp hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
+# Desktop and shell configuration
 ./scripts/configure-user.sh
-# CachyOS ships a Lua-based Hyprland config (hyprland.lua + config/) that
-# Hyprland loads in preference to hyprland.conf. Remove it so ours is used.
-rm -f  "$HOME/.config/hypr/hyprland.lua"
-rm -rf "$HOME/.config/hypr/config"
-echo "✓ Hyprland config installed"
-
-# Waybar Config
-mkdir -p "$HOME/.config/waybar/scripts"
-cp waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
-cp waybar/style.css "$HOME/.config/waybar/style.css"
-cp waybar/scripts/*.sh "$HOME/.config/waybar/scripts/"
-chmod +x "$HOME/.config/waybar/scripts/"*.sh
-echo "✓ Waybar config installed"
+echo "✓ Hyprland, Fish, and Waybar configuration installed"
 
 # VPN (Cloudflare WARP)
 sudo systemctl enable --now warp-svc >/dev/null 2>&1
@@ -73,42 +59,11 @@ echo "✓ SearXNG running on http://127.0.0.1:8888"
 # Browser: check the latest release on every install, including existing installs.
 ./scripts/update-helium
 
-# Storage mount
-
-STORAGE_UUID="3a0db3a3-f6ab-4ce6-8c18-1e27e54ce7ef"
-STORAGE_MNT="/mnt/storage"
-
-# Create mountpoint
-sudo mkdir -p "$STORAGE_MNT"
-
-# Add to fstab if missing
-if ! sudo grep -q "$STORAGE_UUID" /etc/fstab; then
-  echo "UUID=$STORAGE_UUID $STORAGE_MNT btrfs defaults,noatime,compress=zstd 0 0" \
-    | sudo tee -a /etc/fstab >/dev/null
-  echo "✓ Added /mnt/storage to /etc/fstab"
-fi
-
-# Mount via fstab if not already mounted
-if ! mountpoint -q "$STORAGE_MNT"; then
-  sudo mount "$STORAGE_MNT"
-  if ! mountpoint -q "$STORAGE_MNT"; then
-    echo "✗ Failed to mount $STORAGE_MNT"
-    exit 1
-  fi
-fi
-
-# Resolve user dynamically
-USER_UID="$(id -u)"
-USER_GID="$(id -g)"
-
-# Never recursive
-sudo chown "$USER_UID:$USER_GID" "$STORAGE_MNT"
-
-echo "✓ /mnt/storage mounted and ownership set"
-
-# Downloading wallpaper
-if [ ! -f /mnt/storage/wallpaper.png ]; then
-  curl -L -o /mnt/storage/wallpaper.png "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg" >/dev/null 2>&1
+# Wallpaper (stored under the user's data directory, without a disk-specific mount).
+WALLPAPER_DIR="$HOME/.local/share/wallpapers"
+mkdir -p "$WALLPAPER_DIR"
+if [ ! -f "$WALLPAPER_DIR/default.jpg" ]; then
+  curl --fail --location --show-error -o "$WALLPAPER_DIR/default.jpg" "https://w.wallhaven.cc/full/qz/wallhaven-qzvw3r.jpg"
   echo "✓ Wallpaper downloaded"
 fi
 

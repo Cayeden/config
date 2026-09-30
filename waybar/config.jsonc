@@ -89,11 +89,11 @@
     },
     "memory": {
         "format": "󰍛 {}%",
-        "tooltip-format": "{used:0.1f}GiB / {total:0.1f}GiB ({percentage}%)\n4× 16GB DDR4-3600 (dual channel)",
+        "tooltip-format": "{used:0.1f}GiB / {total:0.1f}GiB ({percentage}%)",
         "on-click": "kitty -e btop"
     },
     "disk": {
-        "path": "/mnt/storage",
+        "path": "/",
         "format": "{percentage_used}% used",
         "tooltip-format": "{path}: {used} / {total} ({percentage_used}%)"
     },
