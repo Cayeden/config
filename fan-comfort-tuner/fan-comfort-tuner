@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-exec /usr/bin/python3 "${XDG_DATA_HOME:-$HOME/.local/share}/fan-comfort-tuner/fan_comfort_tuner.py" "$@"

@@ -13,7 +13,7 @@ sudo pacman -Syu --noconfirm
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --needed --noconfirm keepassxc steam grim slurp wl-clipboard mpv hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils wofi paru kitty dolphin fish playerctl brightnessctl polkit-kde-agent lact python-gobject gtk4 libadwaita curl openssl desktop-file-utils
+sudo pacman -S --needed --noconfirm keepassxc steam grim slurp wl-clipboard mpv hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils wofi paru kitty dolphin fish playerctl brightnessctl polkit-kde-agent curl openssl desktop-file-utils
 echo "✓ Packages installed (pacman)"
 paru -S --needed --noconfirm visual-studio-code-bin lmstudio-bin
 echo "✓ Packages installed (paru/AUR)"
@@ -67,7 +67,7 @@ sed -i "s/SEARXNG_SECRET_PLACEHOLDER/$(openssl rand -hex 32)/" "$HOME/searxng/co
 sudo docker compose -f "$HOME/searxng/docker-compose.yml" up -d >/dev/null 2>&1
 echo "✓ SearXNG running on http://127.0.0.1:8888"
 
-# Polkit, CPU sensor driver, and Fan Comfort Tuner dependencies
+# Polkit and CPU sensor driver
 ./scripts/configure-system.sh
 
 # Browser: check the latest release on every install, including existing installs.

@@ -31,7 +31,9 @@ for relative in \
   .local/share/applications/ai.opencode.desktop \
   .local/bin/claude .local/share/claude .local/state/claude .claude .claude.json \
   .local/share/applications/claude-code-url-handler.desktop \
-  .local/bin/mouse-recorder .local/bin/mouse-recorder.save .local/share/mouse-recorder; do
+  .local/bin/mouse-recorder .local/bin/mouse-recorder.save .local/share/mouse-recorder \
+  .local/bin/fan-comfort-tuner .local/share/fan-comfort-tuner \
+  .local/share/applications/fan-comfort-tuner.desktop; do
   archive "$HOME/$relative"
 done
 
@@ -53,22 +55,11 @@ fi
 printf '\nexport BROWSER=/usr/local/bin/helium\n' >> "$environment_file"
 systemctl --user set-environment BROWSER=/usr/local/bin/helium
 
-copy_config fan-comfort-tuner/fan_comfort_tuner.py "$HOME/.local/share/fan-comfort-tuner/fan_comfort_tuner.py"
-copy_config fan-comfort-tuner/fan-comfort-tuner "$HOME/.local/bin/fan-comfort-tuner"
 copy_config scripts/update-helium "$HOME/.local/bin/update-helium"
-chmod +x "$HOME/.local/bin/fan-comfort-tuner" "$HOME/.local/bin/update-helium"
+chmod +x "$HOME/.local/bin/update-helium"
 
 mkdir -p "$HOME/.local/share/applications"
 copy_config desktop-files/helium.desktop "$HOME/.local/share/applications/helium.desktop"
-copy_config desktop-files/fan-comfort-tuner.desktop "$HOME/.local/share/applications/fan-comfort-tuner.desktop"
-# An absolute Exec also works in sessions that do not include ~/.local/bin.
-python - "$HOME/.local/share/applications/fan-comfort-tuner.desktop" "$HOME/.local/bin/fan-comfort-tuner" <<'PY'
-import pathlib, sys
-path = pathlib.Path(sys.argv[1])
-executable = sys.argv[2].replace('\\', '\\\\').replace('"', '\\"').replace('`', '\\`').replace('$', '\\$').replace('%', '%%')
-path.write_text(path.read_text().replace('Exec=fan-comfort-tuner', f'Exec="{executable}"'))
-PY
-
 mime_file="$HOME/.config/mimeapps.list"
 if [[ -f "$mime_file" ]]; then
   cp "$mime_file" "$backup/mimeapps.list"

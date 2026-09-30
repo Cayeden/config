@@ -5,7 +5,6 @@ set -euo pipefail
 if pacman -Q vlc >/dev/null 2>&1; then
   sudo pacman -R --noconfirm vlc
 fi
-sudo systemctl enable --now lactd.service
 
 # k10temp exposes AMD CPU temperatures. Keep Intel/non-AMD installs portable.
 if grep -q 'vendor_id.*AuthenticAMD' /proc/cpuinfo; then

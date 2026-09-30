@@ -6,7 +6,7 @@ if [[ "$(id -u)" -eq 0 ]]; then
   exit 1
 fi
 sudo -v
-sudo pacman -S --needed --noconfirm polkit-kde-agent mpv lact python-gobject gtk4 libadwaita curl jq fish desktop-file-utils
+sudo pacman -S --needed --noconfirm polkit-kde-agent mpv curl jq fish desktop-file-utils
 ./scripts/configure-user.sh
 ./scripts/configure-system.sh
 ./scripts/update-helium
