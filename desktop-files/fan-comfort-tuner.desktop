@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Fan Comfort Tuner
+Comment=Preview GPU fan speeds and save a LACT fan curve
+Exec=fan-comfort-tuner
+Icon=preferences-system-fan-symbolic
+Terminal=false
+Categories=System;
+StartupNotify=true

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+destination=${HELIUM_INSTALL_PATH:-/usr/local/bin/helium}
+case "$(uname -m)" in
+  x86_64) architecture=x86_64 ;;
+  aarch64) architecture=arm64 ;;
+  *) echo "Unsupported Helium architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+temporary=$(mktemp -d)
+trap 'rm -rf "$temporary"' EXIT
+curl --fail --silent --show-error --location --retry 3 \
+  https://api.github.com/repos/imputnet/helium-linux/releases/latest \
+  -o "$temporary/release.json"
+asset=$(jq -ce --arg suffix "-$architecture.AppImage" \
+  '.assets[] | select(.name | endswith($suffix))' "$temporary/release.json")
+url=$(jq -er '.browser_download_url' <<< "$asset")
+digest=$(jq -er '.digest | select(startswith("sha256:"))' <<< "$asset")
+expected=${digest#sha256:}
+[[ "$expected" =~ ^[a-f0-9]{64}$ ]] || { echo "Invalid release digest" >&2; exit 1; }
+[[ "$url" == https://github.com/imputnet/helium-linux/releases/download/* ]] || exit 1
+
+if [[ -f "$destination" ]] && [[ "$(sha256sum "$destination" | cut -d ' ' -f 1)" == "$expected" ]]; then
+  echo "Helium is current: $(jq -r '.tag_name' "$temporary/release.json")"
+  exit 0
+fi
+
+cache=${XDG_CACHE_HOME:-$HOME/.cache}/helium-updater
+mkdir -p "$cache"
+download="$cache/$expected.AppImage"
+if [[ ! -f "$download" ]] || ! printf '%s  %s\n' "$expected" "$download" | sha256sum --check --status; then
+  curl --fail --show-error --location --retry 3 "$url" -o "$temporary/helium"
+  printf '%s  %s\n' "$expected" "$temporary/helium" | sha256sum --check --status
+  mv "$temporary/helium" "$download"
+fi
+# Publish only the verified download; the old binary survives download failures.
+staged=$(sudo mktemp "${destination}.update.XXXXXX")
+trap 'rm -rf "$temporary"; if [[ -n "${staged:-}" ]]; then sudo rm -f "$staged"; fi' EXIT
+sudo install -m 755 "$download" "$staged"
+sudo mv -f "$staged" "$destination"
+staged=
+echo "Helium updated to $(jq -r '.tag_name' "$temporary/release.json"). Reopen the browser to use it."
