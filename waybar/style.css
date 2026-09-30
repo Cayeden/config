@@ -1,4 +1,4 @@
-/* Palette pulled from hyprland.conf's own border gradient (cyan/green),
+/* Palette pulled from hyprland.lua's own border gradient (cyan/green),
    set against a slate base so the bar reads as part of the same rice. */
 @define-color base       #1a1b26;
 @define-color surface    rgba(36, 40, 59, 0.82);
@@ -23,7 +23,7 @@ window#waybar {
 }
 
 /* Every module group is its own pill: rounding echoes decoration.rounding
-   in hyprland.conf, translucent to sit with the compositor's blur layer. */
+   in hyprland.lua, translucent to sit with the compositor's blur layer. */
 #workspaces,
 #submap,
 #window,

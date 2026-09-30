@@ -25,7 +25,7 @@ copy_config() {
 }
 
 copy_config fish/config.fish "$HOME/.config/fish/config.fish"
-copy_config hypr/hyprland.conf "$HOME/.config/hypr/hyprland.conf"
+copy_config hypr/hyprland.lua "$HOME/.config/hypr/hyprland.lua"
 copy_config hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
 copy_config waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
 copy_config waybar/style.css "$HOME/.config/waybar/style.css"
