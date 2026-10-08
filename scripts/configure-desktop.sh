@@ -22,7 +22,6 @@ copy_config() {
     cp --remove-destination "$source" "$destination"
 }
 copy_config hypr/hyprland.lua "$config_home/hypr/hyprland.lua"
-copy_config noctalia/config.toml "$config_home/noctalia/config.toml"
 for script in noctalia/scripts/*; do
     copy_config "$script" "$config_home/noctalia/scripts/${script##*/}"
     chmod +x "$config_home/noctalia/scripts/${script##*/}"
@@ -30,6 +29,7 @@ done
 for script in noctalia/plugins/local-services/*; do
     copy_config "$script" "$data_home/noctalia/plugins/local-services/${script##*/}"
 done
+copy_config noctalia/config.toml "$config_home/noctalia/config.toml"
 mkdir -p "$HOME/.local/bin"
 copy_config scripts/stratactl "$HOME/.local/bin/stratactl"
 chmod +x "$HOME/.local/bin/stratactl"

@@ -45,11 +45,7 @@ type = "cayeden/local-services:strata"
 type = "cayeden/local-services:vpn"
 
 [widget.resources]
-type = "sysmon"
-stat = "gpu_vram"
-visualization = "none"
-[widget.resources.actions]
-left = "panel-toggle control-center system"
+type = "cayeden/local-services:resources"
 
 [widget.clock]
 format = "{:%H:%M}"
