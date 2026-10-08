@@ -1,0 +1,19 @@
+id = "cayeden/local-services"
+name = "Local services"
+version = "1.0.0"
+plugin_api = 24
+author = "cayeden"
+description = "Strata model toggle, Docker containers, and RiseupVPN status."
+dependencies = ["python3", "systemctl", "docker"]
+
+[[widget]]
+id = "strata"
+entry = "strata.luau"
+
+[[widget]]
+id = "docker"
+entry = "docker.luau"
+
+[[widget]]
+id = "vpn"
+entry = "vpn.luau"

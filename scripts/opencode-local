@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if ! command -v opencode >/dev/null; then
+    printf 'OpenCode is missing. Install opencode-ai before using this launcher.\n' >&2
+    exit 1
+fi
+"$HOME/.local/bin/stratactl" start --wait
+exec opencode "$@"

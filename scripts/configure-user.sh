@@ -25,14 +25,8 @@ copy_config() {
 }
 
 copy_config fish/config.fish "$HOME/.config/fish/config.fish"
-copy_config hypr/hyprland.lua "$HOME/.config/hypr/hyprland.lua"
-copy_config hypr/hyprlock.conf "$HOME/.config/hypr/hyprlock.conf"
-copy_config waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
-copy_config waybar/style.css "$HOME/.config/waybar/style.css"
-for script in waybar/scripts/*.sh; do
-  copy_config "$script" "$HOME/.config/waybar/scripts/${script##*/}"
-  chmod +x "$HOME/.config/waybar/scripts/${script##*/}"
-done
+./scripts/configure-desktop.sh
+copy_config opencode/AGENTS.md "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/AGENTS.md"
 
 mkdir -p "$HOME/.config/uwsm"
 environment_file="$HOME/.config/uwsm/env"

@@ -6,7 +6,7 @@ hl.monitor({ output = "DP-3", mode = "2560x1440@164.55", position = "2560x0", sc
 
 local terminal = "kitty"
 local fileManager = "dolphin"
-local menu = "wofi --show drun"
+local menu = "noctalia msg panel-toggle launcher"
 local mainMod = "SUPER"
 
 hl.env("BROWSER", "/usr/local/bin/helium")
@@ -14,9 +14,8 @@ hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd([[sh -c "hyprpaper & sleep 1 && hyprctl hyprpaper wallpaper ',/mnt/storage/wallpaper.png,contain'"]])
-    hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
-    hl.exec_cmd("waybar")
+    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+    hl.exec_cmd("noctalia")
 end)
 
 hl.config({
@@ -92,11 +91,11 @@ end
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 hl.device({ name = "epic-mouse-v1", sensitivity = -0.5 })
 
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp)" ~/Pictures/$(date +%F_%T).png]]))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd([[command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()']]))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("noctalia msg session lock"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))

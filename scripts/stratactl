@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+import argparse
+import fcntl
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+from urllib.error import URLError
+from urllib.parse import urlparse
+from urllib.request import urlopen
+
+CONFIG = Path(os.environ.get('XDG_CONFIG_HOME') or Path.home() / '.config') / 'strata/control.json'
+STATE = Path(os.environ.get('XDG_STATE_HOME') or Path.home() / '.local/state') / 'strata'
+
+
+def run(*args, check=True, timeout=10):
+    return subprocess.run(args, capture_output=True, text=True, check=check, timeout=timeout)
+
+
+def validate(config):
+    launcher = Path(config['launcher']).expanduser().resolve()
+    if not launcher.is_file() or not os.access(launcher, os.X_OK):
+        raise ValueError(f'Strata launcher is missing or not executable: {launcher}')
+    unit = config.get('unit', 'strata-local.service')
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+\.service', unit) or unit.startswith('-'):
+        raise ValueError('Invalid service name')
+    url = config.get('url', 'http://127.0.0.1:8081').rstrip('/')
+    parsed = urlparse(url)
+    if parsed.scheme != 'http' or parsed.hostname not in ('127.0.0.1', 'localhost', '::1') or parsed.username is not None or parsed.path or parsed.query or parsed.fragment:
+        raise ValueError('Strata URL must be a local HTTP address without a path')
+    return {'launcher': str(launcher), 'unit': unit, 'url': url}
+
+
+def load():
+    return validate(json.loads(CONFIG.read_text()))
+
+
+def service_state(config):
+    result = run('systemctl', '--user', 'show', config['unit'], '--property=ActiveState', '--value', check=False)
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or 'Cannot query the user service manager')
+    return result.stdout.strip() or 'inactive'
+
+
+def health(config):
+    try:
+        with urlopen(config['url'] + '/health', timeout=0.7) as response:
+            result = json.load(response)
+        return result if result.get('service') == 'strata' else None
+    except (OSError, ValueError, URLError):
+        return None
+
+
+def status(config):
+    active = service_state(config)
+    if active == 'deactivating':
+        state = 'stopping'
+    elif active in ('active', 'activating', 'reloading'):
+        state = 'ready' if (health(config) or {}).get('loaded') else 'loading'
+    elif active == 'failed':
+        state = 'failed'
+    elif health(config):
+        state = 'external'
+    else:
+        state = 'off'
+    return state
+
+
+def presentation(state, detail=''):
+    labels = {'ready': 'On', 'loading': 'Loading', 'stopping': 'Stopping', 'off': 'Off',
+              'failed': 'Failed', 'external': 'External', 'unconfigured': 'Setup', 'error': 'Error'}
+    tips = {'ready': 'Click to unload the model and release VRAM.',
+            'loading': 'The model is loading. Click to cancel and release VRAM.',
+            'stopping': 'Stopping the model service and releasing VRAM.',
+            'off': 'Click to load the model.', 'failed': 'The model service failed. Click to retry; right-click for logs.',
+            'external': 'Strata is running outside the registered service. Stop it from its original launcher.',
+            'unconfigured': 'Register a launcher with stratactl configure /path/to/run-iq2_xs.sh.',
+            'error': detail}
+    color = 'primary' if state == 'ready' else 'tertiary' if state in ('loading', 'stopping') else 'error' if state in ('failed', 'error') else 'on_surface_variant'
+    return {'state': state, 'text': 'Strata ' + labels[state], 'tooltip': tips[state], 'color': color}
+
+
+def start(config):
+    active = service_state(config)
+    if active in ('active', 'activating', 'reloading'):
+        return
+    if active == 'deactivating':
+        raise RuntimeError('Strata is still stopping. Wait until the button shows Off.')
+    parsed = urlparse(config['url'])
+    import socket
+    with socket.socket(socket.AF_INET6 if parsed.hostname == '::1' else socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(0.5)
+        if sock.connect_ex((parsed.hostname, parsed.port or 80)) == 0:
+            raise RuntimeError('The Strata port is occupied by another process; refusing to start a second server.')
+    run('systemctl', '--user', 'reset-failed', config['unit'], check=False)
+    launcher = Path(config['launcher'])
+    log = STATE / 'server.log'
+    run('systemd-run', '--user', '--unit=' + config['unit'],
+        '--property=WorkingDirectory=' + str(launcher.parent),
+        '--property=StandardOutput=append:' + str(log),
+        '--property=StandardError=append:' + str(log),
+        '--property=KillMode=control-group', '--property=TimeoutStopSec=30', str(launcher))
+
+
+def stop(config):
+    active = service_state(config)
+    if active in ('active', 'activating', 'reloading'):
+        run('systemctl', '--user', 'stop', '--no-block', config['unit'])
+    elif active == 'failed':
+        run('systemctl', '--user', 'reset-failed', config['unit'])
+    elif active != 'deactivating' and health(config):
+        raise RuntimeError('Strata is outside the registered service; refusing to stop an unrelated process.')
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Load or unload a local Strata model service.')
+    sub = parser.add_subparsers(dest='action', required=True)
+    configure = sub.add_parser('configure')
+    configure.add_argument('launcher')
+    configure.add_argument('--url', default='http://127.0.0.1:8081')
+    configure.add_argument('--unit', default='strata-local.service')
+    query = sub.add_parser('status')
+    query.add_argument('--json', action='store_true')
+    for action in ('start', 'stop', 'toggle'):
+        command = sub.add_parser(action)
+        command.add_argument('--wait', action='store_true')
+    sub.add_parser('logs')
+    sub.add_parser('open')
+    args = parser.parse_args()
+    STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if args.action == 'configure':
+        config = validate(vars(args))
+        with (STATE / 'control.lock').open('w') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            CONFIG.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            temporary = CONFIG.with_suffix('.tmp')
+            temporary.write_text(json.dumps(config, indent=2) + '\n')
+            temporary.chmod(0o600)
+            temporary.replace(CONFIG)
+        print(f'Registered {config["launcher"]}')
+        return
+    try:
+        config = load()
+    except FileNotFoundError:
+        if args.action == 'status':
+            result = presentation('unconfigured')
+            print(json.dumps(result) if args.json else result['text'])
+            return
+        raise RuntimeError('Run stratactl configure /path/to/run-iq2_xs.sh first.')
+    if args.action == 'status':
+        result = presentation(status(config))
+        print(json.dumps(result) if args.json else result['text'])
+        return
+    if args.action == 'logs':
+        path = STATE / 'server.log'
+        if path.exists():
+            os.execlp('tail', 'tail', '-n', '100', '-F', str(path))
+        os.execlp('journalctl', 'journalctl', '--user', '-u', config['unit'], '-f')
+    if args.action == 'open':
+        run('xdg-open', config['url'])
+        return
+    with (STATE / 'control.lock').open('w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        action = args.action
+        if action == 'toggle':
+            active = service_state(config)
+            action = 'stop' if active in ('active', 'activating', 'reloading', 'deactivating') else 'start'
+        (start if action == 'start' else stop)(config)
+    if args.wait:
+        for _ in range(300):
+            state = status(config)
+            if state == ('ready' if action == 'start' else 'off'):
+                break
+            if state == 'failed':
+                raise RuntimeError('Strata failed to load. Run stratactl logs.')
+            time.sleep(1)
+        else:
+            raise RuntimeError('Timed out waiting for Strata.')
+    print(presentation(status(config))['text'])
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError) as error:
+        print(str(error), file=sys.stderr)
+        sys.exit(1)
