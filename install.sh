@@ -13,7 +13,7 @@ sudo pacman -Syu --noconfirm
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --needed --noconfirm keepassxc steam python grim slurp satty wl-clipboard mpv noctalia obs-studio pavucontrol ripgrep cloudflare-warp-bin btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils paru kitty dolphin fish playerctl brightnessctl curl openssl desktop-file-utils
+sudo pacman -S --needed --noconfirm keepassxc steam python grim slurp satty ddcutil wl-clipboard mpv noctalia obs-studio pavucontrol ripgrep cloudflare-warp-bin btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils paru kitty dolphin fish playerctl brightnessctl curl openssl desktop-file-utils
 echo "✓ Packages installed (pacman)"
 paru -S --needed --noconfirm visual-studio-code-bin lmstudio-bin
 echo "✓ Packages installed (paru/AUR)"

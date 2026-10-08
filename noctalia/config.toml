@@ -24,9 +24,9 @@ radius = 10
 scale = 1.0
 widget_spacing = 6
 reserve_space = true
-start = ["launcher", "workspaces", "docker", "strata"]
+start = ["workspaces", "docker", "vpn", "strata"]
 center = ["active_window"]
-end = ["media", "vpn", "network", "volume", "cpu", "gpu", "ram", "disk", "clock", "notifications", "tray", "session"]
+end = ["media", "network", "volume", "resources", "clock", "notifications", "tray", "session"]
 
 [widget.active_window]
 max_length = 260
@@ -44,32 +44,12 @@ type = "cayeden/local-services:strata"
 [widget.vpn]
 type = "cayeden/local-services:vpn"
 
-[widget.cpu]
+[widget.resources]
 type = "sysmon"
-stat = "cpu_usage"
+stat = "gpu_vram"
 visualization = "none"
-[widget.cpu.actions]
-left = "exec kitty -e btop"
-
-[widget.gpu]
-type = "sysmon"
-stat = "gpu_usage"
-visualization = "none"
-[widget.gpu.actions]
-left = "exec kitty -e nvidia-smi -l 1"
-
-[widget.ram]
-type = "sysmon"
-stat = "ram_pct"
-visualization = "none"
-[widget.ram.actions]
-left = "exec kitty -e btop"
-
-[widget.disk]
-type = "sysmon"
-stat = "disk_used_pct"
-path = "/mnt/storage"
-visualization = "none"
+[widget.resources.actions]
+left = "panel-toggle control-center system"
 
 [widget.clock]
 format = "{:%H:%M}"
@@ -99,3 +79,21 @@ builtin_ids = []
 [plugins]
 enabled = ["cayeden/local-services"]
 auto_update = "none"
+
+[notification]
+monitors = ["DP-2"]
+follow_focused_output = false
+
+[weather]
+enabled = false
+
+[brightness]
+enable_ddcutil = true
+
+[brightness.monitor.DP-2]
+backend = "ddcutil"
+ddc_bus = 4
+
+[brightness.monitor.DP-3]
+backend = "ddcutil"
+ddc_bus = 5

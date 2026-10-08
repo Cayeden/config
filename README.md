@@ -48,7 +48,7 @@ noctalia plugins lint ~/.local/share/noctalia/plugins/local-services
 Hyprland --verify-config -c ~/.config/hypr/hyprland.lua
 ```
 
-The bar uses built-in CPU, GPU, RAM and disk monitors. NVIDIA monitoring uses NVML. The custom plugin keeps Docker container count and tooltips, RiseupVPN connection status and window activation, and the Strata model toggle. RiseupVPN status requires its real tunnel and helper process; install `riseup-vpn` separately when needed. A user-installed `riseup-vpn` wrapper on PATH is respected.
+The bar has one VRAM indicator. Its tooltip includes system readings; clicking it opens System details. VPN and Strata sit together on the left. The launcher remains on Super+R. NVIDIA monitoring uses NVML. Notification popups are limited to DP-2, the left monitor. Weather is disabled. External-monitor brightness uses opt-in DDC/CI through ddcutil. These identical MSI displays need explicit bus pins: DP-2 uses I2C bus 4, DP-3 uses bus 5. The left display was identified with a temporary brightness change; adapt these pins on another machine. The custom plugin keeps Docker container count and tooltips, RiseupVPN connection status and window activation, and the Strata model toggle. RiseupVPN status requires its real tunnel and helper process; install `riseup-vpn` separately when needed. A user-installed `riseup-vpn` wrapper on PATH is respected.
 
 ## Strata model toggle
 
@@ -88,3 +88,11 @@ python tests/test_stratactl.py
 ```
 
 They use isolated temporary configuration and temporary services. They check concurrent startup, cancellation of the whole process group, retained failure status, and protection of an occupied port. They do not load model weights.
+
+For the specific stale zenpower blacklist issue, run:
+
+```bash
+sudo ./scripts/repair-cpu-sensor.sh
+```
+
+The repair loads k10temp, configures boot-time loading, and shadows the vendor blacklist when zenpower has no module for the current kernel. It preserves any nonempty existing local override and leaves the zenpower package installed. This is a separate repair command; desktop provisioning does not run it.
