@@ -97,3 +97,12 @@ ddc_bus = 4
 [brightness.monitor.DP-3]
 backend = "ddcutil"
 ddc_bus = 5
+
+[control_center]
+hidden_tabs = ["calendar"]
+
+[[control_center.shortcuts]]
+type = "notification"
+
+[[control_center.shortcuts]]
+type = "power_profile"
