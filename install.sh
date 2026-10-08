@@ -20,6 +20,7 @@ echo "✓ Packages installed (paru/AUR)"
 
 # Desktop and shell configuration
 ./scripts/configure-user.sh
+./scripts/install-opencode-desktop.sh
 echo "✓ Hyprland, Fish, and Noctalia configuration installed"
 
 # VPN (Cloudflare WARP)

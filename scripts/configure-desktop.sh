@@ -35,6 +35,24 @@ copy_config scripts/stratactl "$HOME/.local/bin/stratactl"
 chmod +x "$HOME/.local/bin/stratactl"
 copy_config scripts/opencode-local "$HOME/.local/bin/opencode-local"
 chmod +x "$HOME/.local/bin/opencode-local"
+if [[ -x "$data_home/opencode-desktop/OpenCode.AppImage" ]]; then
+    desktop=$(mktemp)
+    cat > "$desktop" <<EOF
+[Desktop Entry]
+Name=OpenCode
+Comment=OpenCode Desktop with local Strata
+Exec="$HOME/.local/bin/opencode-local" %U
+Terminal=false
+Type=Application
+Icon=ai.opencode.desktop
+StartupWMClass=ai.opencode.desktop
+Categories=Development;
+MimeType=x-scheme-handler/opencode;
+EOF
+    copy_config "$desktop" "$data_home/applications/ai.opencode.desktop.desktop"
+    rm -f "$desktop"
+    update-desktop-database "$data_home/applications"
+fi
 if command -v noctalia >/dev/null; then noctalia config validate; fi
 printf 'Noctalia configuration installed. Backups: %s\n' "${backup:-none needed}"
 printf 'Existing Noctalia GUI overrides remain in %s/noctalia/settings.toml.\n' "$state_home"

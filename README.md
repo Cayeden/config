@@ -73,7 +73,7 @@ stratactl logs
 stratactl open
 ```
 
-`opencode-local` starts the registered model, waits until it is loaded, and runs an already installed OpenCode. Configure OpenCode's OpenAI-compatible provider to the Strata API separately. Keep its context limit aligned with Strata's `--max-context`. Model quantization, CUDA toolchains, and OpenCode installation are independent of desktop provisioning.
+Run `./scripts/install-opencode-desktop.sh` to install OpenCode Desktop 1.18.35 for Linux x86_64 from its official release, verified against its SHA512 checksum. It installs an OpenCode application-menu entry and icons. `opencode-local` starts the registered model, waits until it is loaded, and opens the desktop app. Closing OpenCode leaves Strata available; use the Strata bar toggle to unload it. The desktop app uses existing OpenCode configuration and chats. Configure its OpenAI-compatible provider to the Strata API separately and keep the context limit aligned with Strata's `--max-context`. Desktop provisioning refreshes the launcher without downloading the app or model. The standalone npm CLI is optional.
 
 ## CPU temperature
 
