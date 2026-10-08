@@ -1,0 +1,104 @@
+[accessibility]
+ui_scale = 1.0
+
+[shell]
+font_family = "MesloLGS Nerd Font Mono"
+polkit_agent = true
+settings_show_advanced = true
+clipboard_image_action_command = "satty -f -"
+telemetry_enabled = false
+
+[shell.panel]
+open_near_click_control_center = true
+
+[shell.screenshot]
+copy_to_clipboard = true
+save_to_file = true
+
+[bar.default]
+position = "top"
+thickness = 34
+margin_edge = 6
+margin_ends = 10
+radius = 10
+scale = 1.0
+widget_spacing = 6
+reserve_space = true
+start = ["workspaces", "docker", "vpn", "strata"]
+center = ["active_window"]
+end = ["media", "network", "volume", "resources", "clock", "notifications", "tray", "session"]
+
+[widget.active_window]
+max_length = 260
+
+[widget.workspaces]
+label_source = "id"
+show_labels = true
+
+[widget.docker]
+type = "cayeden/local-services:docker"
+
+[widget.strata]
+type = "cayeden/local-services:strata"
+
+[widget.vpn]
+type = "cayeden/local-services:vpn"
+
+[widget.resources]
+type = "cayeden/local-services:resources"
+
+[widget.clock]
+format = "{:%H:%M}"
+
+[widget.media]
+hide_when_no_media = true
+
+[system.monitor]
+cpu_poll_seconds = 2
+memory_poll_seconds = 2
+gpu_poll_seconds = 2
+disk_poll_seconds = 10
+
+[wallpaper]
+fill_mode = "fit"
+transition_on_startup = false
+[wallpaper.default]
+path = "/mnt/storage/wallpaper.png"
+
+[theme]
+mode = "dark"
+source = "builtin"
+builtin = "Tokyo-Night"
+[theme.templates]
+builtin_ids = []
+
+[plugins]
+enabled = ["cayeden/local-services"]
+auto_update = "none"
+
+[notification]
+monitors = ["DP-2"]
+follow_focused_output = false
+
+[weather]
+enabled = false
+
+[brightness]
+enable_ddcutil = true
+
+[brightness.monitor.DP-2]
+backend = "ddcutil"
+ddc_bus = 4
+
+[brightness.monitor.DP-3]
+backend = "ddcutil"
+ddc_bus = 5
+
+[control_center]
+hidden_tabs = ["calendar"]
+
+[[control_center.shortcuts]]
+type = "notification"
+
+[[control_center.shortcuts]]
+type = "power_profile"

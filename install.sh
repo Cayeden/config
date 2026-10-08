@@ -13,14 +13,15 @@ sudo pacman -Syu --noconfirm
 echo "✓ Packages updated"
 
 # Install User Packages
-sudo pacman -S --needed --noconfirm keepassxc steam grim slurp wl-clipboard mpv hyprpaper obs-studio pavucontrol ripgrep cloudflare-warp-bin waybar hyprlock btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils wofi paru kitty dolphin fish playerctl brightnessctl polkit-kde-agent curl openssl desktop-file-utils
+sudo pacman -S --needed --noconfirm keepassxc steam python grim slurp satty ddcutil wl-clipboard mpv noctalia obs-studio pavucontrol ripgrep cloudflare-warp-bin btop networkmanager jq docker docker-compose github-cli ufw bluez bluez-utils paru kitty dolphin fish playerctl brightnessctl curl openssl desktop-file-utils
 echo "✓ Packages installed (pacman)"
 paru -S --needed --noconfirm visual-studio-code-bin lmstudio-bin
 echo "✓ Packages installed (paru/AUR)"
 
 # Desktop and shell configuration
 ./scripts/configure-user.sh
-echo "✓ Hyprland, Fish, and Waybar configuration installed"
+./scripts/install-opencode-desktop.sh
+echo "✓ Hyprland, Fish, and Noctalia configuration installed"
 
 # VPN (Cloudflare WARP)
 sudo systemctl enable --now warp-svc >/dev/null 2>&1

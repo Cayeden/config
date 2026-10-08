@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+app="${XDG_DATA_HOME:-$HOME/.local/share}/opencode-desktop/OpenCode.AppImage"
+if [[ ! -x "$app" ]]; then
+    printf 'OpenCode Desktop is missing. Run scripts/install-opencode-desktop.sh from the setup repo.\n' >&2
+    exit 1
+fi
+if ! "$HOME/.local/bin/stratactl" start --wait; then
+    notify-send 'OpenCode' 'Strata could not start. Check the Strata bar button or stratactl logs.' || true
+    exit 1
+fi
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+exec "$app" "$@"
