@@ -44,6 +44,8 @@ The script backs up changed files and installs the local-services plugin. It pre
 
 The wallpaper picker browses `~/Pictures/Wallpapers`. The desktop setup creates this folder and links the existing `/mnt/storage/wallpaper.png` when available. Add more images there to use them in the picker or wallpaper rotation.
 
+The official Wallhaven plugin adds online wallpaper browsing through the Wallhaven shortcut in the Control Center Home tab. Noctalia fetches the enabled plugin from its official source. Downloads use the same wallpaper folder.
+
 ```bash
 noctalia config validate
 noctalia plugins lint ~/.local/share/noctalia/plugins/local-services
