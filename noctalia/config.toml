@@ -74,7 +74,7 @@ builtin = "Tokyo-Night"
 builtin_ids = []
 
 [plugins]
-enabled = ["cayeden/local-services"]
+enabled = ["cayeden/local-services", "noctalia/wallhaven"]
 auto_update = "none"
 
 [notification]
@@ -103,3 +103,6 @@ type = "notification"
 
 [[control_center.shortcuts]]
 type = "power_profile"
+
+[[control_center.shortcuts]]
+type = "noctalia/wallhaven:shortcut"
