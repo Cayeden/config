@@ -26,7 +26,7 @@ widget_spacing = 6
 reserve_space = true
 start = ["workspaces", "docker", "vpn", "strata"]
 center = ["active_window"]
-end = ["media", "network", "volume", "resources", "clock", "notifications", "tray", "session"]
+end = ["media", "volume", "resources", "clock", "notifications", "tray", "session"]
 
 [widget.active_window]
 max_length = 260
@@ -60,6 +60,7 @@ gpu_poll_seconds = 2
 disk_poll_seconds = 10
 
 [wallpaper]
+directory = "~/Pictures/Wallpapers"
 fill_mode = "fit"
 transition_on_startup = false
 [wallpaper.default]

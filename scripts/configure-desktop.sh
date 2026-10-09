@@ -30,6 +30,10 @@ for script in noctalia/plugins/local-services/*; do
     copy_config "$script" "$data_home/noctalia/plugins/local-services/${script##*/}"
 done
 copy_config noctalia/config.toml "$config_home/noctalia/config.toml"
+mkdir -p "$HOME/Pictures/Wallpapers"
+if [[ -f /mnt/storage/wallpaper.png && ! -e "$HOME/Pictures/Wallpapers/wallpaper.png" && ! -L "$HOME/Pictures/Wallpapers/wallpaper.png" ]]; then
+    ln -s /mnt/storage/wallpaper.png "$HOME/Pictures/Wallpapers/wallpaper.png"
+fi
 mkdir -p "$HOME/.local/bin"
 copy_config scripts/stratactl "$HOME/.local/bin/stratactl"
 chmod +x "$HOME/.local/bin/stratactl"

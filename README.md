@@ -42,6 +42,8 @@ On an existing machine with Noctalia installed, apply only the desktop changes:
 
 The script backs up changed files and installs the local-services plugin. It preserves Noctalia's GUI overrides in `~/.local/state/noctalia/settings.toml`, which take precedence over the repo config. It does not kill running desktop processes or uninstall packages. Log out and in to switch the live session, or stop your old shell tools and start Noctalia manually after validating the configs.
 
+The wallpaper picker browses `~/Pictures/Wallpapers`. The desktop setup creates this folder and links the existing `/mnt/storage/wallpaper.png` when available. Add more images there to use them in the picker or wallpaper rotation.
+
 ```bash
 noctalia config validate
 noctalia plugins lint ~/.local/share/noctalia/plugins/local-services
