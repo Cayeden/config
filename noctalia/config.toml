@@ -6,6 +6,9 @@ font_family = "MesloLGS Nerd Font Mono"
 polkit_agent = true
 settings_show_advanced = true
 clipboard_image_action_command = "satty -f -"
+clipboard_enabled = true
+clipboard_keep_from_closed_apps = false
+clipboard_history_max_entries = 500
 telemetry_enabled = false
 
 [shell.panel]
@@ -26,7 +29,7 @@ widget_spacing = 6
 reserve_space = true
 start = ["workspaces", "docker", "vpn", "strata"]
 center = ["active_window"]
-end = ["media", "volume", "resources", "clock", "notifications", "tray", "session"]
+end = ["media", "volume", "resources", "clipboard", "clock", "notifications", "tray", "session"]
 
 [widget.active_window]
 max_length = 260

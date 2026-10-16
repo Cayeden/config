@@ -30,6 +30,12 @@ for script in noctalia/plugins/local-services/*; do
     copy_config "$script" "$data_home/noctalia/plugins/local-services/${script##*/}"
 done
 copy_config noctalia/config.toml "$config_home/noctalia/config.toml"
+copy_config systemd/user/clipboard-persistence.service "$config_home/systemd/user/clipboard-persistence.service"
+systemctl --user daemon-reload
+if [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v wl-clip-persist >/dev/null; then
+    systemctl --user import-environment WAYLAND_DISPLAY
+    systemctl --user restart clipboard-persistence.service
+fi
 mkdir -p "$HOME/Pictures/Wallpapers"
 if [[ -f /mnt/storage/wallpaper.png && ! -e "$HOME/Pictures/Wallpapers/wallpaper.png" && ! -L "$HOME/Pictures/Wallpapers/wallpaper.png" ]]; then
     ln -s /mnt/storage/wallpaper.png "$HOME/Pictures/Wallpapers/wallpaper.png"
