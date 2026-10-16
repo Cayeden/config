@@ -12,7 +12,7 @@ Review `install.sh` before running it: it upgrades packages, installs applicatio
 
 ## Hyprland
 
-The native Lua config preserves the existing monitors, keybindings, animations, window rules, wallpaper, and desktop layout. Hyprland selects the Lua backend when starting a session; after installing it into an existing session, log out and back in once. Noctalia supplies the bar, launcher, wallpaper, notifications, lock screen, screenshots, and Polkit agent. Super+R opens its launcher, Super+L locks, and Super+Shift+S selects a screenshot region. Existing Waybar and Hyprlock files are retained as fallback files.
+The native Lua config preserves the existing monitors, keybindings, animations, window rules, wallpaper, and desktop layout. Hyprland selects the Lua backend when starting a session; after installing it into an existing session, log out and back in once. Noctalia supplies the bar, launcher, wallpaper, notifications, lock screen, screenshots, and Polkit agent. Super+R opens its launcher, Super+L locks, and Super+Shift+S selects a screenshot region. Super+V opens clipboard history; Super+Shift+V toggles floating windows. Existing Waybar and Hyprlock files are retained as fallback files.
 
 Validate before starting a session:
 
@@ -37,10 +37,13 @@ The updater checks the release SHA-256 digest, skips an identical installed bina
 On an existing machine with Noctalia installed, apply only the desktop changes:
 
 ```bash
+sudo pacman -S --needed wl-clip-persist
 ./scripts/configure-desktop.sh
 ```
 
 The script backs up changed files and installs the local-services plugin. It preserves Noctalia's GUI overrides in `~/.local/state/noctalia/settings.toml`, which take precedence over the repo config. It does not kill running desktop processes or uninstall packages. Log out and in to switch the live session, or stop your old shell tools and start Noctalia manually after validating the configs.
+
+Clipboard history is available from Super+V and the clipboard button in the bar. Noctalia keeps up to 500 unpinned text and image entries, encrypted through the desktop Secret Service keyring. `wl-clip-persist` keeps the live clipboard available after its source application closes. The desktop installer installs its user service and starts it in an active Wayland session; Hyprland restarts it at login after importing the session environment. Noctalia's own closed-app retention is disabled because the external service handles it. Clipboard history and keyring data stay local.
 
 The wallpaper picker browses `~/Pictures/Wallpapers`. The desktop setup creates this folder and links the existing `/mnt/storage/wallpaper.png` when available. Add more images there to use them in the picker or wallpaper rotation.
 

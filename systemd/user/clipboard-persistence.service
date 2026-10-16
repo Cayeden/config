@@ -1,0 +1,11 @@
+[Unit]
+Description=Keep the Wayland clipboard available after applications close
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/wl-clip-persist --clipboard regular --all-mime-type-regex "^(?!x-kde-passwordManagerHint).+" --disable-timestamps
+Environment=RUST_LOG=warn
+Restart=on-failure
+RestartSec=2
+UMask=0077
